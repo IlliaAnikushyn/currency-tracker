@@ -1,0 +1,19 @@
+{
+  "name": "currency-tracker",
+  "version": "0.1.0",
+  "description": "Трекер курсів валют і криптовалют (курсова робота ОП2)",
+  "main": "lib/index.js",
+  "scripts": {
+    "start": "node example/main.js"
+  },
+  "author": "Illia Anikushyn",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IlliaAnikushyn/currency-tracker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/IlliaAnikushyn/currency-tracker/issues"
+  },
+  "homepage": "https://github.com/IlliaAnikushyn/currency-tracker#readme"
+}
