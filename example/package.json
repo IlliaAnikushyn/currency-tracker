@@ -1,0 +1,15 @@
+{
+  "name": "currency-tracker-example",
+  "version": "0.1.0",
+  "description": "Example app that uses the currency-tracker library",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "author": "Illia Anikushyn",
+  "license": "MIT",
+  "dependencies": {
+    "currency-tracker": "file:.."
+  }
+}
