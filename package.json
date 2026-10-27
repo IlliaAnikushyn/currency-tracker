@@ -1,7 +1,7 @@
 {
   "name": "currency-tracker",
   "version": "0.1.0",
-  "description": "Трекер курсів валют і криптовалют (курсова робота ОП2)",
+  "description": "Console tracker for fiat and crypto exchange rates",
   "main": "lib/index.js",
   "scripts": {
     "start": "node example/main.js",

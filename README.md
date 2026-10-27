@@ -1,22 +1,63 @@
 # Currency Tracker
 
-Курсова робота з дисципліни "Основи програмування 2".
+A console tracker for fiat and crypto exchange rates, built with Node.js.
+It fetches rates from public APIs, caches them, watches for changes
+and sends alerts when a rate moves significantly.
 
-Автор: Анікушин Ілля Романович, група ІМ-55
+> **Status:** in development. Features are added task by task (see below).
 
-Консольний трекер курсів валют і криптовалют на Node.js: отримує курси з API,
-кешує їх, відстежує зміни та надсилає сповіщення.
+## Features
 
-## Практичні завдання
+- Fiat exchange rates from the [National Bank of Ukraine API](https://bank.gov.ua/ua/open-data/api-dev)
+- Crypto prices from the [CoinGecko API](https://www.coingecko.com/en/api)
+- Response caching to avoid hitting API rate limits
+- Rate change events and prioritized alerts
+- Processing of large CSV files with rate history
 
-| №   | Тема                               | Де в коді                                                                                   |
-| --- | ---------------------------------- | ------------------------------------------------------------------------------------------- |
-| 1   | Генератори та ітератори            | -                                                                                           |
-| 2   | Налаштування проєкту               | `package.json`, `.gitignore`, `.editorconfig`, `LICENSE`, `eslint.config.js`, `.prettierrc` |
-| 3   | Мемоізація                         | -                                                                                           |
-| 4   | Двостороння черга з пріоритетом    | -                                                                                           |
-| 5   | Асинхронні варіанти функцій масиву | -                                                                                           |
-| 6   | Обробка великих даних (стріми)     | -                                                                                           |
-| 7   | Події (EventEmitter)               | -                                                                                           |
-| 8   | Проксі з автентифікацією для API   | -                                                                                           |
-| 9   | Декоратор логування                | -                                                                                           |
+## Requirements
+
+- [Node.js](https://nodejs.org/) 22 or newer
+
+## Installation
+
+```bash
+git clone https://github.com/IlliaAnikushyn/currency-tracker.git
+cd currency-tracker
+npm install
+```
+
+## Usage
+
+```bash
+npm start
+```
+
+## Scripts
+
+| Command          | Description                   |
+| ---------------- | ----------------------------- |
+| `npm start`      | Run the example app           |
+| `npm run lint`   | Check the code with ESLint    |
+| `npm run format` | Format the code with Prettier |
+
+## Coursework
+
+Coursework for the "Programming Fundamentals 2" course (Основи програмування 2), Igor Sikorsky KPI.
+
+**Author:** Анікушин Ілля Романович (Illia Anikushyn), group ІМ-55
+
+| #   | Task                            | Location                                                                                    |
+| --- | ------------------------------- | ------------------------------------------------------------------------------------------- |
+| 1   | Generators and iterators        | -                                                                                           |
+| 2   | Project setup                   | `package.json`, `.gitignore`, `.editorconfig`, `LICENSE`, `eslint.config.js`, `.prettierrc` |
+| 3   | Memoization                     | -                                                                                           |
+| 4   | Double-ended priority queue     | -                                                                                           |
+| 5   | Async array functions           | -                                                                                           |
+| 6   | Large data processing (streams) | -                                                                                           |
+| 7   | Events (EventEmitter)           | -                                                                                           |
+| 8   | Auth proxy for an API client    | -                                                                                           |
+| 9   | Logging decorator               | -                                                                                           |
+
+## License
+
+[MIT](LICENSE)
