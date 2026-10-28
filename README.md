@@ -64,7 +64,7 @@ Coursework for the "Programming Fundamentals 2" course (Основи прогр�
 | 4   | Double-ended priority queue     | -                                                                                                                  |
 | 5   | Async array functions           | -                                                                                                                  |
 | 6   | Large data processing (streams) | -                                                                                                                  |
-| 7   | Events (EventEmitter)           | -                                                                                                                  |
+| 7   | Events (EventEmitter)           | [`lib/events.js`](lib/events.js), [`example/main.js`](example/main.js)                                             |
 | 8   | Auth proxy for an API client    | -                                                                                                                  |
 | 9   | Logging decorator               | -                                                                                                                  |
 
@@ -85,6 +85,15 @@ that installs the library with `file:..`. `package-lock.json` files are
 committed, while `node_modules/`, `.env`, logs and editor folders are ignored
 (`.gitignore`). Code style is checked with ESLint (`eslint.config.js`) and
 Prettier (`.prettierrc`, `.editorconfig`).
+
+**Task 7.** `createEmitter()` is a small custom emitter instead of Node's
+`EventEmitter`. Node stops calling listeners when one of them throws, so here
+every listener is called inside `try/catch`, and the error is sent to the
+separate `error` channel. If nobody listens to `error`, the error is printed
+with `console.error` and the program keeps running. `off()` removes a listener
+and deletes the event name when its last listener is gone. In the example,
+`watchRates()` emits `change` events, and independent listeners print the
+change, alert about big jumps and unsubscribe themselves after a few events.
 
 ## License
 
