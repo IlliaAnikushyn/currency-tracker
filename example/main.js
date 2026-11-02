@@ -5,6 +5,7 @@ const {
   cycle,
   timeoutIterator,
   createEmitter,
+  PriorityQueue,
 } = require('currency-tracker');
 
 console.log(formatRate('USD', 41.5));
@@ -84,11 +85,27 @@ const countChanges = () => {
   }
 };
 
+const alerts = new PriorityQueue();
+
+const queueAlert = (change) => {
+  const item = `${change.code} moved by ${change.percent.toFixed(2)}%`;
+  const priority = Math.abs(change.percent);
+  alerts.enqueue(item, priority);
+};
+
 emitter.on('change', printChange);
 emitter.on('change', brokenListener);
 emitter.on('change', alertBigJump);
 emitter.on('change', countChanges);
+emitter.on('change', queueAlert);
 emitter.on('error', (err) => console.log('Listener error:', err.message));
 
 console.log('Watching rates:');
 watchRates(2);
+
+console.log(`Alerts in queue: ${alerts.size}`);
+console.log('Highest:', alerts.dequeue('highest'));
+console.log('Lowest:', alerts.dequeue('lowest'));
+console.log('Oldest:', alerts.dequeue('oldest'));
+console.log('Newest:', alerts.dequeue('newest'));
+console.log(`Alerts left: ${alerts.size}`);
