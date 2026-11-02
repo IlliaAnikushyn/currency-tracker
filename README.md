@@ -61,7 +61,7 @@ Coursework for the "Programming Fundamentals 2" course (Основи прогр�
 | 1   | Generators and iterators        | [`lib/generators.js`](lib/generators.js), [`lib/timeout.js`](lib/timeout.js), [`example/main.js`](example/main.js) |
 | 2   | Project setup                   | [`package.json`](package.json), [`lib/index.js`](lib/index.js), [`example/package.json`](example/package.json)     |
 | 3   | Memoization                     | -                                                                                                                  |
-| 4   | Double-ended priority queue     | -                                                                                                                  |
+| 4   | Double-ended priority queue     | [`lib/queue.js`](lib/queue.js), [`example/main.js`](example/main.js)                                               |
 | 5   | Async array functions           | -                                                                                                                  |
 | 6   | Large data processing (streams) | -                                                                                                                  |
 | 7   | Events (EventEmitter)           | [`lib/events.js`](lib/events.js), [`example/main.js`](example/main.js)                                             |
@@ -85,6 +85,16 @@ that installs the library with `file:..`. `package-lock.json` files are
 committed, while `node_modules/`, `.env`, logs and editor folders are ignored
 (`.gitignore`). Code style is checked with ESLint (`eslint.config.js`) and
 Prettier (`.prettierrc`, `.editorconfig`).
+
+**Task 4.** `PriorityQueue` keeps two arrays with the same entry objects:
+`byOrder` in insertion order and `byPriority` sorted by priority. All four
+modes take an element from an edge of one array (`[0]` or the last one),
+so there is no search. `dequeue()` only marks an entry as `removed`, and
+`edge()` drops such entries when it finds them at the edge (lazy deletion).
+A new entry goes after entries with the same priority. Insertion looks for
+its place from the end, so it is O(n) in the worst case; binary search or
+a heap would make it faster. In the example, a `change` listener puts an
+alert into the queue with the size of the jump as its priority.
 
 **Task 7.** `createEmitter()` is a small custom emitter instead of Node's
 `EventEmitter`. Node stops calling listeners when one of them throws, so here
