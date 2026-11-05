@@ -6,6 +6,7 @@ const {
   timeoutIterator,
   createEmitter,
   PriorityQueue,
+  asyncMap,
 } = require('currency-tracker');
 
 console.log(formatRate('USD', 41.5));
@@ -109,3 +110,25 @@ console.log('Lowest:', alerts.dequeue('lowest'));
 console.log('Oldest:', alerts.dequeue('oldest'));
 console.log('Newest:', alerts.dequeue('newest'));
 console.log(`Alerts left: ${alerts.size}`);
+
+// Імітація запиту курсу до API із затримкою
+const fetchRate = (code, callback) => {
+  setTimeout(() => {
+    if (!rates[code]) {
+      callback(new Error(`Unknown currency: ${code}`));
+      return;
+    }
+    callback(null, rates[code]);
+  }, 100);
+};
+
+const printRates = (err, result) => {
+  if (err) {
+    console.log('asyncMap error:', err.message);
+    return;
+  }
+  console.log('asyncMap result:', result);
+};
+
+asyncMap(codes, fetchRate, printRates);
+asyncMap(['USD', 'GBP', 'EUR'], fetchRate, printRates);
