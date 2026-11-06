@@ -7,6 +7,7 @@ const {
   createEmitter,
   PriorityQueue,
   asyncMap,
+  asyncMapPromise,
 } = require('currency-tracker');
 
 console.log(formatRate('USD', 41.5));
@@ -132,3 +133,18 @@ const printRates = (err, result) => {
 
 asyncMap(codes, fetchRate, printRates);
 asyncMap(['USD', 'GBP', 'EUR'], fetchRate, printRates);
+
+asyncMapPromise(codes, fetchRate)
+  .then((result) => console.log('Promise result:', result))
+  .catch((err) => console.log('Promise error:', err.message));
+
+const showRates = async () => {
+  try {
+    const result = await asyncMapPromise(['EUR', 'GBP'], fetchRate);
+    console.log('await result:', result);
+  } catch (err) {
+    console.log('await error:', err.message);
+  }
+};
+
+showRates();
