@@ -113,14 +113,21 @@ console.log('Newest:', alerts.dequeue('newest'));
 console.log(`Alerts left: ${alerts.size}`);
 
 // Імітація запиту курсу до API із затримкою
-const fetchRate = (code, callback) => {
-  setTimeout(() => {
+const fetchRate = (code, callback, signal) => {
+  const timer = setTimeout(() => {
+    if (signal) {
+      signal.removeEventListener('abort', onAbort);
+    }
     if (!rates[code]) {
       callback(new Error(`Unknown currency: ${code}`));
       return;
     }
     callback(null, rates[code]);
   }, 100);
+  const onAbort = () => clearTimeout(timer);
+  if (signal) {
+    signal.addEventListener('abort', onAbort);
+  }
 };
 
 const printRates = (err, result) => {
@@ -148,3 +155,7 @@ const showRates = async () => {
 };
 
 showRates();
+
+const controller = new AbortController();
+asyncMap(codes, fetchRate, printRates, controller.signal);
+setTimeout(() => controller.abort(), 150);
