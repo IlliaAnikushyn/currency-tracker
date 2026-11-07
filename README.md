@@ -62,7 +62,7 @@ Coursework for the "Programming Fundamentals 2" course (Основи прогр�
 | 2   | Project setup                   | [`package.json`](package.json), [`lib/index.js`](lib/index.js), [`example/package.json`](example/package.json)     |
 | 3   | Memoization                     | -                                                                                                                  |
 | 4   | Double-ended priority queue     | [`lib/queue.js`](lib/queue.js), [`example/main.js`](example/main.js)                                               |
-| 5   | Async array functions           | -                                                                                                                  |
+| 5   | Async array functions           | [`lib/async-map.js`](lib/async-map.js), [`example/main.js`](example/main.js)                                       |
 | 6   | Large data processing (streams) | -                                                                                                                  |
 | 7   | Events (EventEmitter)           | [`lib/events.js`](lib/events.js), [`example/main.js`](example/main.js)                                             |
 | 8   | Auth proxy for an API client    | -                                                                                                                  |
@@ -95,6 +95,17 @@ A new entry goes after entries with the same priority. Insertion looks for
 its place from the end, so it is O(n) in the worst case; binary search or
 a heap would make it faster. In the example, a `change` listener puts an
 alert into the queue with the size of the jump as its priority.
+
+**Task 5.** The chosen array function is `map`. `asyncMap(items, fn, callback, signal)`
+is the callback version: `fn(item, cb, signal)` must call `cb(err, result)`,
+and the final `callback` gets `(err, results)` exactly once (guarded by the
+`finished` flag). Items are processed one by one, so stopping the work is
+simple: after an error or abort the next item is not started. This is slower
+than running all items at once, but the order of results is kept.
+`asyncMapPromise()` wraps the callback version in a `Promise`; the example
+uses it with `.then()` and with `async/await`. With an `AbortSignal`, the map
+ends with `AbortError`; the abort listener is removed in `finish()`, and
+`fetchRate()` in the example clears its timer on abort.
 
 **Task 7.** `createEmitter()` is a small custom emitter instead of Node's
 `EventEmitter`. Node stops calling listeners when one of them throws, so here
