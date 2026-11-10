@@ -60,7 +60,7 @@ Coursework for the "Programming Fundamentals 2" course (Основи прогр�
 | --- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | 1   | Generators and iterators        | [`lib/generators.js`](lib/generators.js), [`lib/timeout.js`](lib/timeout.js), [`example/main.js`](example/main.js) |
 | 2   | Project setup                   | [`package.json`](package.json), [`lib/index.js`](lib/index.js), [`example/package.json`](example/package.json)     |
-| 3   | Memoization                     | -                                                                                                                  |
+| 3   | Memoization                     | [`lib/memoize.js`](lib/memoize.js), [`example/main.js`](example/main.js)                                           |
 | 4   | Double-ended priority queue     | [`lib/queue.js`](lib/queue.js), [`example/main.js`](example/main.js)                                               |
 | 5   | Async array functions           | [`lib/async-map.js`](lib/async-map.js), [`example/main.js`](example/main.js)                                       |
 | 6   | Large data processing (streams) | -                                                                                                                  |
@@ -85,6 +85,17 @@ that installs the library with `file:..`. `package-lock.json` files are
 committed, while `node_modules/`, `.env`, logs and editor folders are ignored
 (`.gitignore`). Code style is checked with ESLint (`eslint.config.js`) and
 Prettier (`.prettierrc`, `.editorconfig`).
+
+**Task 3.** `memoize(fn, { max, policy, ttl })` works with any function: the
+cache key is `JSON.stringify(args)`, and `has()` is used instead of `get()`, so
+falsy results are cached too. When the cache is full, an eviction policy
+(Strategy pattern) chooses the key to delete: `'lru'` (default), `'lfu'`, or
+a custom function `(cache) => key`. For LRU, a cache hit moves the key to the
+end of the `Map` (`delete` + `set`), so the first key is the least recently
+used one. TTL is a separate option instead of a fourth policy, because it
+answers another question (is the value still fresh?) and can be combined with
+any policy. In the example, rates are cached with a TTL, and a custom policy
+removes the newest key.
 
 **Task 4.** `PriorityQueue` keeps two arrays with the same entry objects:
 `byOrder` in insertion order and `byPriority` sorted by priority. All four

@@ -4,6 +4,7 @@ const {
   formatRate,
   cycle,
   timeoutIterator,
+  memoize,
   createEmitter,
   PriorityQueue,
   asyncMap,
@@ -40,6 +41,21 @@ for (const code of codes) {
   const { sum, count } = totals[code];
   console.log(formatRate(code, sum / count), `(${count} polls)`);
 }
+
+const cachedRate = memoize(pollRate, { ttl: 200 });
+const first = cachedRate('USD').toFixed(3);
+const second = cachedRate('USD').toFixed(3);
+console.log(`Cached USD: ${first}, again from cache: ${second}`);
+setTimeout(() => {
+  console.log(`USD after TTL: ${cachedRate('USD').toFixed(3)}`);
+}, 300);
+
+const dropNewest = (cache) => [...cache.keys()].pop();
+const lastRates = memoize(pollRate, { max: 2, policy: dropNewest });
+const usd = lastRates('USD');
+lastRates('EUR');
+lastRates('PLN');
+console.log('Custom policy kept USD:', lastRates('USD') === usd);
 
 const emitter = createEmitter();
 
