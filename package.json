@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "start": "node example/main.js",
+    "generate": "node example/generate-csv.js",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
