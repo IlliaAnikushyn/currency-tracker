@@ -35,8 +35,12 @@ exactly like any other project that installs the library.
 ## Usage
 
 ```bash
+npm run generate
 npm start
 ```
+
+`npm run generate` creates the large CSV file used by task 6. Without it,
+the example still runs and prints a `CSV error` for the missing file.
 
 The example app prints a few formatted rates, cycles through currency codes
 with a generator, then polls simulated rates for one second and prints
@@ -44,11 +48,12 @@ the average rate for each currency.
 
 ## Scripts
 
-| Command          | Description                   |
-| ---------------- | ----------------------------- |
-| `npm start`      | Run the example app           |
-| `npm run lint`   | Check the code with ESLint    |
-| `npm run format` | Format the code with Prettier |
+| Command            | Description                            |
+| ------------------ | -------------------------------------- |
+| `npm start`        | Run the example app                    |
+| `npm run generate` | Generate a large CSV with rate history |
+| `npm run lint`     | Check the code with ESLint             |
+| `npm run format`   | Format the code with Prettier          |
 
 ## Coursework
 
@@ -63,7 +68,7 @@ Coursework for the "Programming Fundamentals 2" course (Основи прогр�
 | 3   | Memoization                     | [`lib/memoize.js`](lib/memoize.js), [`example/main.js`](example/main.js)                                           |
 | 4   | Double-ended priority queue     | [`lib/queue.js`](lib/queue.js), [`example/main.js`](example/main.js)                                               |
 | 5   | Async array functions           | [`lib/async-map.js`](lib/async-map.js), [`example/main.js`](example/main.js)                                       |
-| 6   | Large data processing (streams) | -                                                                                                                  |
+| 6   | Large data processing (streams) | [`lib/csv-stats.js`](lib/csv-stats.js), [`example/generate-csv.js`](example/generate-csv.js)                       |
 | 7   | Events (EventEmitter)           | [`lib/events.js`](lib/events.js), [`example/main.js`](example/main.js)                                             |
 | 8   | Auth proxy for an API client    | -                                                                                                                  |
 | 9   | Logging decorator               | -                                                                                                                  |
@@ -117,6 +122,17 @@ than running all items at once, but the order of results is kept.
 uses it with `.then()` and with `async/await`. With an `AbortSignal`, the map
 ends with `AbortError`; the abort listener is removed in `finish()`, and
 `fetchRate()` in the example clears its timer on abort.
+
+**Task 6.** `npm run generate` writes `example/data/history.csv` (1,000,000
+rows, about 37 MB) with a write stream. When `write()` returns `false`, the
+script waits for the `drain` event (backpressure), so the rows are not
+buffered in memory. The file is generated, so it is ignored by git.
+`readStats(file)` reads it with `fs.createReadStream` and `for await`, chunk
+by chunk: each chunk is split into lines, and the last, possibly cut, line is
+kept until the next chunk. Only the totals per currency (count, sum, min, max)
+are kept in memory, never the whole file or an array of rows. A stream error
+(for example, a missing file) rejects the returned `Promise`, so the caller
+gets it in `.catch()`.
 
 **Task 7.** `createEmitter()` is a small custom emitter instead of Node's
 `EventEmitter`. Node stops calling listeners when one of them throws, so here

@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('node:path');
 const {
   formatRate,
   cycle,
@@ -9,6 +10,7 @@ const {
   PriorityQueue,
   asyncMap,
   asyncMapPromise,
+  readStats,
 } = require('currency-tracker');
 
 console.log(formatRate('USD', 41.5));
@@ -175,3 +177,17 @@ showRates();
 const controller = new AbortController();
 asyncMap(codes, fetchRate, printRates, controller.signal);
 setTimeout(() => controller.abort(), 150);
+
+const historyFile = path.join(__dirname, 'data', 'history.csv');
+readStats(historyFile)
+  .then((stats) => {
+    console.log('CSV history stats:');
+    for (const code of Object.keys(stats)) {
+      const { count, sum, min, max } = stats[code];
+      const average = (sum / count).toFixed(3);
+      console.log(
+        `${code}: ${count} rows, avg ${average}, min ${min}, max ${max}`,
+      );
+    }
+  })
+  .catch((err) => console.log('CSV error:', err.message));
