@@ -5,6 +5,7 @@ const {
   BaseClient,
   AuthProxy,
   apiKeyAuth,
+  bearerAuth,
   RatesService,
 } = require('currency-tracker');
 const { startDemoServer } = require('./demo-server.js');
@@ -33,6 +34,24 @@ const main = async () => {
   } catch (err) {
     console.log('Without auth:', err.message);
   }
+
+  const tokenClient = new AuthProxy(
+    new BaseClient(baseUrl),
+    apiKeyAuth(apiKey),
+  );
+  const getNewToken = async () => {
+    const res = await tokenClient.request({ method: 'POST', path: '/token' });
+    console.log('Got new token:', res.data.token);
+    return res.data.token;
+  };
+  const withToken = new RatesService(
+    new AuthProxy(
+      new BaseClient(baseUrl),
+      bearerAuth('old-token', getNewToken),
+    ),
+  );
+  console.log('Bearer, EUR:', await withToken.getRate('EUR'));
+  console.log('Bearer, PLN:', await withToken.getRate('PLN'));
 
   server.close();
 };
