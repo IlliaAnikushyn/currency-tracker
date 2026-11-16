@@ -7,6 +7,8 @@ const {
   apiKeyAuth,
   bearerAuth,
   RatesService,
+  LoggingProxy,
+  RateLimitProxy,
 } = require('currency-tracker');
 const { startDemoServer } = require('./demo-server.js');
 
@@ -44,11 +46,9 @@ const main = async () => {
     console.log('Got new token:', res.data.token);
     return res.data.token;
   };
+  const http = new RateLimitProxy(new BaseClient(baseUrl), 500);
   const withToken = new RatesService(
-    new AuthProxy(
-      new BaseClient(baseUrl),
-      bearerAuth('old-token', getNewToken),
-    ),
+    new AuthProxy(new LoggingProxy(http), bearerAuth('old-token', getNewToken)),
   );
   console.log('Bearer, EUR:', await withToken.getRate('EUR'));
   console.log('Bearer, PLN:', await withToken.getRate('PLN'));
