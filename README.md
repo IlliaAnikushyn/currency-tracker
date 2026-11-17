@@ -52,6 +52,7 @@ the average rate for each currency.
 | ------------------ | -------------------------------------- |
 | `npm start`        | Run the example app                    |
 | `npm run generate` | Generate a large CSV with rate history |
+| `npm run api`      | Run the API client demo (task 8)       |
 | `npm run lint`     | Check the code with ESLint             |
 | `npm run format`   | Format the code with Prettier          |
 
@@ -61,17 +62,17 @@ Coursework for the "Programming Fundamentals 2" course (Основи прогр�
 
 **Author:** Анікушин Ілля Романович (Illia Anikushyn), group ІМ-55
 
-| #   | Task                            | Location                                                                                                           |
-| --- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| 1   | Generators and iterators        | [`lib/generators.js`](lib/generators.js), [`lib/timeout.js`](lib/timeout.js), [`example/main.js`](example/main.js) |
-| 2   | Project setup                   | [`package.json`](package.json), [`lib/index.js`](lib/index.js), [`example/package.json`](example/package.json)     |
-| 3   | Memoization                     | [`lib/memoize.js`](lib/memoize.js), [`example/main.js`](example/main.js)                                           |
-| 4   | Double-ended priority queue     | [`lib/queue.js`](lib/queue.js), [`example/main.js`](example/main.js)                                               |
-| 5   | Async array functions           | [`lib/async-map.js`](lib/async-map.js), [`example/main.js`](example/main.js)                                       |
-| 6   | Large data processing (streams) | [`lib/csv-stats.js`](lib/csv-stats.js), [`example/generate-csv.js`](example/generate-csv.js)                       |
-| 7   | Events (EventEmitter)           | [`lib/events.js`](lib/events.js), [`example/main.js`](example/main.js)                                             |
-| 8   | Auth proxy for an API client    | -                                                                                                                  |
-| 9   | Logging decorator               | -                                                                                                                  |
+| #   | Task                            | Location                                                                                                                   |
+| --- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Generators and iterators        | [`lib/generators.js`](lib/generators.js), [`lib/timeout.js`](lib/timeout.js), [`example/main.js`](example/main.js)         |
+| 2   | Project setup                   | [`package.json`](package.json), [`lib/index.js`](lib/index.js), [`example/package.json`](example/package.json)             |
+| 3   | Memoization                     | [`lib/memoize.js`](lib/memoize.js), [`example/main.js`](example/main.js)                                                   |
+| 4   | Double-ended priority queue     | [`lib/queue.js`](lib/queue.js), [`example/main.js`](example/main.js)                                                       |
+| 5   | Async array functions           | [`lib/async-map.js`](lib/async-map.js), [`example/main.js`](example/main.js)                                               |
+| 6   | Large data processing (streams) | [`lib/csv-stats.js`](lib/csv-stats.js), [`example/generate-csv.js`](example/generate-csv.js)                               |
+| 7   | Events (EventEmitter)           | [`lib/events.js`](lib/events.js), [`example/main.js`](example/main.js)                                                     |
+| 8   | Auth proxy for an API client    | [`lib/auth-proxy.js`](lib/auth-proxy.js), [`lib/proxies.js`](lib/proxies.js), [`example/api-demo.js`](example/api-demo.js) |
+| 9   | Logging decorator               | -                                                                                                                          |
 
 ### Design decisions
 
@@ -142,6 +143,28 @@ with `console.error` and the program keeps running. `off()` removes a listener
 and deletes the event name when its last listener is gone. In the example,
 `watchRates()` emits `change` events, and independent listeners print the
 change, alert about big jumps and unsubscribe themselves after a few events.
+
+**Task 8.** There are three independent layers, all with the same method
+`request({ method, path, query, body, headers })`:
+
+- `BaseClient` (`lib/http-client.js`) is a thin wrapper over `fetch` and knows
+  nothing about authorization.
+- Proxies get another client in the constructor, add their own behavior and
+  delegate the request to it: `AuthProxy` (`lib/auth-proxy.js`),
+  `LoggingProxy` and `RateLimitProxy` (`lib/proxies.js`).
+- `RatesService` (`lib/rates-service.js`) gets a client in the constructor and
+  imports nothing from the client or the proxies.
+
+Everything is put together outside, in `example/api-demo.js`:
+`new RatesService(new AuthProxy(new LoggingProxy(new RateLimitProxy(new BaseClient(url), 500)), strategy))`.
+`AuthProxy` uses a Strategy: `apiKeyAuth(key)` adds an `x-api-key` header,
+and `bearerAuth(token, getNewToken)` adds `Authorization: Bearer ...`. On a
+`401` response, if the strategy can `refresh()`, the proxy gets a new token and
+repeats the request once. The logging proxy is inside the auth proxy, so it
+shows the failed request too. The API key is read from `.env`
+(see `.env.example`). Public rate APIs do not offer bearer tokens that expire,
+so `example/demo-server.js` is a small local `node:http` server that shows
+this flow; it is a demonstration of the scheme, not a real API.
 
 ## License
 
