@@ -29,6 +29,11 @@ const main = async () => {
     new AuthProxy(new BaseClient(baseUrl), apiKeyAuth(apiKey)),
   );
   console.log('API key, USD:', await withKey.getRate('USD'));
+  try {
+    await withKey.getRate('GBP');
+  } catch (err) {
+    console.log('Unknown code:', err.message);
+  }
 
   const noAuth = new RatesService(new BaseClient(baseUrl));
   try {
