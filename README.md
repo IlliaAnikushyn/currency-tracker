@@ -1,18 +1,19 @@
 # Currency Tracker
 
-A console tracker for fiat and crypto exchange rates, built with Node.js.
-It fetches rates from public APIs, caches them, watches for changes
-and sends alerts when a rate moves significantly.
-
-> **Status:** in development. Features are added task by task (see below).
+A console currency rate tracker built with Node.js. It is a small library
+(`lib/`) with an example app (`example/`) that uses it. Rates in the examples
+are simulated or served by a local demo server.
 
 ## Features
 
-- Fiat exchange rates from the [National Bank of Ukraine API](https://bank.gov.ua/ua/open-data/api-dev)
-- Crypto prices from the [CoinGecko API](https://www.coingecko.com/en/api)
-- Response caching to avoid hitting API rate limits
-- Rate change events and prioritized alerts
-- Processing of large CSV files with rate history
+- Polling rates for a limited time with generators and iterators
+- Memoization with LRU, LFU, TTL and custom eviction policies
+- Rate change events with independent listeners
+- Prioritized alerts in a double-ended priority queue
+- Async `map` with callbacks, promises and cancellation
+- Streaming statistics over a large CSV file with rate history
+- HTTP client with auth (API key, bearer token), logging and rate limit proxies
+- Logging decorator with levels, text or JSON output
 
 ## Requirements
 
@@ -48,13 +49,14 @@ the average rate for each currency.
 
 ## Scripts
 
-| Command            | Description                            |
-| ------------------ | -------------------------------------- |
-| `npm start`        | Run the example app                    |
-| `npm run generate` | Generate a large CSV with rate history |
-| `npm run api`      | Run the API client demo (task 8)       |
-| `npm run lint`     | Check the code with ESLint             |
-| `npm run format`   | Format the code with Prettier          |
+| Command            | Description                             |
+| ------------------ | --------------------------------------- |
+| `npm start`        | Run the example app                     |
+| `npm run log`      | Run the logging decorator demo (task 9) |
+| `npm run generate` | Generate a large CSV with rate history  |
+| `npm run api`      | Run the API client demo (task 8)        |
+| `npm run lint`     | Check the code with ESLint              |
+| `npm run format`   | Format the code with Prettier           |
 
 ## Coursework
 
@@ -62,17 +64,17 @@ Coursework for the "Programming Fundamentals 2" course (Основи прогр�
 
 **Author:** Анікушин Ілля Романович (Illia Anikushyn), group ІМ-55
 
-| #   | Task                            | Location                                                                                                                   |
-| --- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Generators and iterators        | [`lib/generators.js`](lib/generators.js), [`lib/timeout.js`](lib/timeout.js), [`example/main.js`](example/main.js)         |
-| 2   | Project setup                   | [`package.json`](package.json), [`lib/index.js`](lib/index.js), [`example/package.json`](example/package.json)             |
-| 3   | Memoization                     | [`lib/memoize.js`](lib/memoize.js), [`example/main.js`](example/main.js)                                                   |
-| 4   | Double-ended priority queue     | [`lib/queue.js`](lib/queue.js), [`example/main.js`](example/main.js)                                                       |
-| 5   | Async array functions           | [`lib/async-map.js`](lib/async-map.js), [`example/main.js`](example/main.js)                                               |
-| 6   | Large data processing (streams) | [`lib/csv-stats.js`](lib/csv-stats.js), [`example/generate-csv.js`](example/generate-csv.js)                               |
-| 7   | Events (EventEmitter)           | [`lib/events.js`](lib/events.js), [`example/main.js`](example/main.js)                                                     |
-| 8   | Auth proxy for an API client    | [`lib/auth-proxy.js`](lib/auth-proxy.js), [`lib/proxies.js`](lib/proxies.js), [`example/api-demo.js`](example/api-demo.js) |
-| 9   | Logging decorator               | -                                                                                                                          |
+| #   | Task                            | Location                                                                                                                       |
+| --- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Generators and iterators        | [`lib/generators.js`](lib/generators.js), [`lib/timeout.js`](lib/timeout.js), [`example/main.js`](example/main.js)             |
+| 2   | Project setup                   | [`package.json`](package.json), [`lib/index.js`](lib/index.js), [`example/package.json`](example/package.json)                 |
+| 3   | Memoization                     | [`lib/memoize.js`](lib/memoize.js), [`example/main.js`](example/main.js)                                                       |
+| 4   | Double-ended priority queue     | [`lib/queue.js`](lib/queue.js), [`example/main.js`](example/main.js)                                                           |
+| 5   | Async array functions           | [`lib/async-map.js`](lib/async-map.js), [`example/main.js`](example/main.js)                                                   |
+| 6   | Large data processing (streams) | [`lib/csv-stats.js`](lib/csv-stats.js), [`example/generate-csv.js`](example/generate-csv.js)                                   |
+| 7   | Events (EventEmitter)           | [`lib/events.js`](lib/events.js), [`example/main.js`](example/main.js)                                                         |
+| 8   | Auth proxy for an API client    | [`lib/auth-proxy.js`](lib/auth-proxy.js), [`lib/proxies.js`](lib/proxies.js), [`example/api-demo.js`](example/api-demo.js)     |
+| 9   | Logging decorator               | [`lib/logger.js`](lib/logger.js), [`lib/log-decorator.js`](lib/log-decorator.js), [`example/log-demo.js`](example/log-demo.js) |
 
 ### Design decisions
 
@@ -165,6 +167,18 @@ shows the failed request too. The API key is read from `.env`
 (see `.env.example`). Public rate APIs do not offer bearer tokens that expire,
 so `example/demo-server.js` is a small local `node:http` server that shows
 this flow; it is a demonstration of the scheme, not a real API.
+
+**Task 9.** `withLogging(fn, level)` returns a new function that logs the
+call with its arguments, then the result or the error. The decorated function
+knows nothing about the logger and behaves the same with or without the
+decorator: a sync function stays sync, and an error is logged and thrown
+again. If the result is a `Promise`, the decorator waits for it with `.then()`
+and logs the resolved value or the rejection. `lib/logger.js` exports a
+single `logger` instance (one logger for the whole system, thanks to the
+`require` cache). Levels are `debug < info < error < critical`; the level
+set with `logger.configure()` filters the records, so the `error` level logs
+only failures. Each record has an ISO timestamp (`new Date().toISOString()`),
+the format is `text` or `json`, and the output is the console or a file.
 
 ## License
 
