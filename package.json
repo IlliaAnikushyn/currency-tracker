@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node example/main.js",
     "api": "node example/api-demo.js",
+    "log": "node example/log-demo.js",
     "generate": "node example/generate-csv.js",
     "lint": "eslint .",
     "format": "prettier --write ."
